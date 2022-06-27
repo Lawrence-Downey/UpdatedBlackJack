@@ -54,7 +54,7 @@ def shuffleDeck(cards):
     while keepShuffling:
         numOfShuffles = input("How many times would you like the dealer to shuffle the deck?\t")
         match = re.findall(pattern, numOfShuffles)
-        if len(match) >= 1:
+        if len(match) != 0:
             print("\nI'm sorry, you must input numbers only. Please try again!\n")
             continue
         elif int(numOfShuffles) <= 0:
@@ -70,6 +70,7 @@ def shuffleDeck(cards):
             break
 
 
+'''
 cards = generateDeck(cardValues, suits)
 
 for card in cards:
@@ -79,3 +80,4 @@ shuffleDeck(cards)
 
 for card in cards:
     print(card.getValue, card.getSuit)
+'''

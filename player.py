@@ -1,5 +1,5 @@
 """
-Used to keep track of user's money
+Player class
 """
 
 from database import cursor, db
