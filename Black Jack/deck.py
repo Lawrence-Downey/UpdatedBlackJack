@@ -3,12 +3,12 @@ Getting card values and suits
 11 = J, 12 = Q, 13 = K, 14 = A
 """
 
-import math
+import re
 import random
 import time
 
 cardValues = list(range(2, 15))
-suits = ["Clubs", "Diamonds", "Hearts", "Spades"]
+suits = ["of Clubs", "of Diamonds", "of Hearts", "of Spades"]
 
 faceCards = {
     "J": 11,
@@ -49,24 +49,28 @@ def generateDeck(cardValues, suits):
 
 
 def shuffleDeck(cards):
-    keepGoing = "y"
-    while keepGoing == "y":
+    pattern = r"[a-zA-Z]+"
+    keepShuffling = True
+    while keepShuffling:
         numOfShuffles = input("How many times would you like the dealer to shuffle the deck?\t")
-        if math.isnan(float(numOfShuffles)):
-            print("I'm sorry, that is not a number. Please try again.")
+        match = re.findall(pattern, numOfShuffles)
+        if len(match) != 0:
+            print("\nI'm sorry, you must input numbers only. Please try again!\n")
             continue
         elif int(numOfShuffles) <= 0:
-            print("I'm sorry, the deck must be shuffled at least once. Please try again.")
+            print("\nI'm sorry, the deck must be shuffled at least once. Please try again.\n")
             continue
         else:
             print("\nCards are now being shuffled\n")
             for shuffle in range(int(numOfShuffles)):
                 random.shuffle(cards)
                 print("%d Shuffle..." % int(shuffle + 1))
-                time.sleep(2)
+                time.sleep(1.5)
+            print("\nShuffling complete!\n")
             break
 
 
+'''
 cards = generateDeck(cardValues, suits)
 
 for card in cards:
@@ -76,3 +80,4 @@ shuffleDeck(cards)
 
 for card in cards:
     print(card.getValue, card.getSuit)
+'''

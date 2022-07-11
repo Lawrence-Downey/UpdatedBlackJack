@@ -1,5 +1,5 @@
 """
-Used to keep track of user's money
+Player class
 """
 
 from database import cursor, db
@@ -9,7 +9,7 @@ import datetime
 
 class Player:
     def __init__(self, firstName, middleName, lastName, username, password, birthYear, birthMonth, birthDay, city,
-                 provState, phoneNumber, email, money):
+                 provState, phoneNumber, email, money, chips):
         self._firstName = firstName
         self._middleName = middleName
         self._lastname = lastName
@@ -23,6 +23,7 @@ class Player:
         self._phoneNumber = phoneNumber
         self._email = email
         self._money = money
+        self._chips = chips
 
     @property
     def firstName(self):
@@ -38,8 +39,8 @@ class Player:
 
     # Including a Setter for Last name in the even the player gets married and changes their last name.
     @lastName.setter
-    def lastName(self, lastName):
-        self._lastname = lastName
+    def lastName(self, newLastName):
+        self._lastname = newLastName
 
     @property
     def getUsername(self):
@@ -64,24 +65,91 @@ class Player:
     # Creates a string combination of the player's date of birth
     @property
     def getDateOfBirth(self):
-        dateOfBirth = "%s/%s/%s".format(self._birthMonth, self._birthDay, self._birthYear)
+        year = self._birthYear
+        month = self._birthMonth
+        day = self._birthDay
+
+        if len(str(day)) < 2:
+            day = "0" + str(day)
+
+        if len(str(month)) < 2:
+            month = "0" + str(month)
+
+        dateOfBirth = "{}/{}/{}".format(month, day, year)
         return dateOfBirth
 
     @property
     def getAge(self):
         currentTime = datetime.datetime.now()
-        birthYear = int(Player.getBirthYear)
-        birthMonth = int(Player.getBirthMonth)
-        birthDay = Player.getBirthDay
-        hadBirthday = False
+        birthYear = currentTime.year
+        birthMonth = currentTime.month
+        birthDay = currentTime.day
 
-        if currentTime.month == birthMonth & currentTime.day == birthDay:
+        if birthDay == self._birthDay & birthMonth == self._birthMonth:
             hadBirthday = True
-            age = currentTime.year - birthYear
-
-        if not hadBirthday:
-            age = (currentTime.year - birthYear) - 1
-            return age
+        elif birthDay >= self._birthDay & birthMonth == self._birthMonth:
+            hadBirthday = True
+        elif birthMonth > self._birthMonth:
+            hadBirthday = True
         else:
             hadBirthday = False
-            return age
+
+        if hadBirthday:
+            return birthYear - self._birthYear
+        else:
+            return (birthYear - self._birthYear) - 1
+
+    @property
+    def provState(self):
+        return self._provState
+
+    # Setter to allow change of Province or State
+    @provState.setter
+    def provState(self, newProvState):
+        self._provState = newProvState
+
+    @property
+    def phoneNumber(self):
+        return self._phoneNumber
+
+    # Setter to allow player to update their Phone Number
+    @phoneNumber.setter
+    def phoneNumber(self, newPhoneNumber):
+        self._phoneNumber = newPhoneNumber
+
+    @property
+    def email(self):
+        return self._email
+
+    # Setter to allow player to update their Email
+    @email.setter
+    def email(self, newEmail):
+        self._email = newEmail
+
+    @property
+    def money(self):
+        return self._money
+
+    # Setter to make updating Player's account balance possible
+    @money.setter
+    def money(self, newAmount):
+        self._money = newAmount
+
+    @property
+    def city(self):
+        return self._city
+
+    # Setter to allow Player to change their city of residence
+    @city.setter
+    def city(self, newCity):
+        self._city = newCity
+
+    @property
+    def chips(self):
+        return self._chips
+
+    # Setter to make it possible to change chip totals for players
+    @chips.setter
+    def chips(self, newChipTotal):
+        self._chips = newChipTotal
+
