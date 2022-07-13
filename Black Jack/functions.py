@@ -5,28 +5,44 @@ This module is used to make calls to and from the Database
 from database import cursor, db
 from player import Player
 import mysql.connector
+import sys
 
 
 def getDealerID(name):
     sql = "SELECT dealerID FROM dealer WHERE name = %s"
     userInput = (name.capitalize(),)
-    cursor.execute(sql, userInput)
-    id = cursor.fetchall()
-    for dealerID in id:
-        return dealerID
+
+    try:
+        cursor.execute(sql, userInput)
+        id = cursor.fetchall()
+        for dealerID in id:
+            return dealerID
+    except mysql.connector.Error as err:
+        print(err)
+        systemShutdown()
 
 
 def getDealerSayings(dealerID, key):
     sql = "SELECT value FROM dealer_sayings ds WHERE ds.dealerID = %s AND ds.key = %s"
-    userInput = (dealerID, key,)
-    cursor.execute(sql, userInput)
-    sayings = cursor.fetchall()
-    for saying in sayings:
-        return saying
+    userInput = (dealerID[0], key,)
+
+    try:
+        cursor.execute(sql, userInput)
+        sayings = cursor.fetchone()
+        for saying in sayings:
+            if saying != '':
+                print(saying)
+                return saying
+            else:
+                return -1
+    except mysql.connector.Error as err:
+        print(err)
+        systemShutdown()
 
 
 def getAllDealerNames():
     sql = "SELECT dealerID, name FROM dealer ORDER BY dealerID"
+
     try:
         cursor.execute(sql)
         names = cursor.fetchall()
@@ -34,17 +50,48 @@ def getAllDealerNames():
             print("{}. {}".format(name[0], name[1]))
     except mysql.connector.Error as err:
         print(err)
+        systemShutdown()
+
+
+def dealerHasSpeech(dealerID):
+    sql = '''SELECT speech FROM dealer where dealerID = %s'''
+    vals = dealerID
+
+    try:
+        cursor.execute(sql, vals)
+        for speech in cursor.fetchone():
+            if speech[0] != 'Y' or speech[0] != 'N':
+                return -1
+            else:
+                return speech
+    except mysql.connector.Error as err:
+        print(err)
+        systemShutdown()
 
 
 def getPlayerMoney(player):
     sql = '''SELECT money FROM player p WHERE p.playerID = %s'''
     playerID = getPlayerID(player)
+
     try:
         cursor.execute(sql, playerID)
         for money in cursor.fetchone():
             return money
     except mysql.connector.Error as err:
         print(err)
+        systemShutdown()
+
+def getPlayerChips(player):
+    sql = '''SELECT chips FROM player p WHERE p.playerID = %s'''
+    playerID = getPlayerID(player)
+
+    try:
+        cursor.execute(sql, playerID)
+        for chip in cursor.fetchone():
+            return chip
+    except mysql.connector.Error as err:
+        print(err)
+        systemShutdown()
 
 
 def getPlayerID(player):
@@ -58,6 +105,7 @@ def getPlayerID(player):
             return playerID
     except mysql.connector.Error as err:
         print(err)
+        systemShutdown()
 
 
 def updatePlayer(player):
@@ -91,19 +139,14 @@ def updatePlayer(player):
         print(player.getUsername + " has been successfully updated!")
     except mysql.connector.Error as err:
         print(err)
+        systemShutdown()
 
 
 def getPlayerAttributes(username, password, playerAttributes):
-    sql = '''SELECT count(*) FROM player p WHERE p.username = %s AND p.password = %s'''
     vals = (username, password,)
     attributes = '''SELECT * FROM player p WHERE p.username = %s AND p.password = %s'''
 
     try:
-        cursor.execute(sql, vals)
-        for count in cursor.fetchall():
-            if count != 1:
-                return -1
-            
         cursor.execute(attributes, vals)
         colNames = cursor.column_names
         results = cursor.fetchall()
@@ -157,18 +200,9 @@ def getPlayerAttributes(username, password, playerAttributes):
         return playerAttributes
     except mysql.connector.Error as err:
         print(err)
-        return -1
-
-username = input("Please enter your username:\t")
-password = input("Please enter your password:\t")
+        systemShutdown()
 
 
-attributes = getPlayerAttributes(username, password, [])
-if attributes == -1:
-    print("I'm sorry, something went wrong!")
-else:
-    existingPlayer = Player(*attributes)
-    print(existingPlayer.firstName + " Obtained successfully!")
-    print(existingPlayer.firstName + " has " + str(existingPlayer.chips) + " chips to play with.")
-
-
+def systemShutdown():
+    print("I'm sorry. Something went wrong.\nSystem will now shutdown.\nGoodbye!")
+    sys.exit()
